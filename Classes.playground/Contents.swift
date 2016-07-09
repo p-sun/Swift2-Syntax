@@ -31,9 +31,9 @@ class B: A {
     }
     
     //Compile Error. Class method overrides a 'final' class method
-    override static func staticFunction(){
-        
-    }
+//    override static func staticFunction(){
+//        
+//    }
     
     //Lets avoid the function called 'classFunctionToBeMakeFinalInImmediateSubclass' being overriden by subclasses
     
@@ -50,27 +50,62 @@ class B: A {
 
 class C: B{
     //Compile Error. Class method overrides a 'final' class method
-    override static func classFunctionToBeMakeFinalInImmediateSubclass(){
-        
-    }
+//    override static func classFunctionToBeMakeFinalInImmediateSubclass(){
+//        
+//    }
 }
 
 //--------------------------------------------
 
-// 'static var' is fine, but not 'class var'.
+/* Stored properties
+ 
+   'static var' can be declared as usual,
+    but 'class var' cannot store properties, and thus must be declared as a block.
+ 
+    Same rules apply for being able to override 'class', but not 'static' or final'
+*/
 
-class myClass {
-    static func myMethod1() {
+class Simple {
+
+    static var myStaticVar = "static var in base"
+    static var myStaticVar2: String {
+        return "static var2 in base"
     }
-    class func myMethod2() {
-    }
-    static var myVar1 = ""
     
-    //Compile error. Class stored properties not yet supported in classes; did you mean 'static'?
-    class var myVar2 == ""
+    final var myFinalVar: String = "final var in base"
+    final var myFinalVar2: String {
+        return "final var2 in base"
+    }
+    
+    //Class stored properties not yet supported in classes; did you mean 'static'?
+//    class var myClassVar1 = "class var1"
+    class var myClassVar: String {
+        return "class var in base"
+    }
+    
+    var myPlainVar = "plain var in base"
+    var myPlainVar2: String {
+        return "plain var2 in base"
+    }
+
 }
 
-myClass.myMethod1()
-myClass.myMethod2()
-myClass.myVar1 = "abc"
+class SubSimple: Simple {
+    
+    // Error: Cannot override with a store property 'myPlainVar'
+//    override var myPlainVar = "static var in subclass"
+    override var myPlainVar2: String {
+        return "plain var2 in base"
+    }
+    
+    override class var myClassVar: String {
+        return "class var in subclass"
+    }
+}
+
+print(Simple.myStaticVar)       // "static var in base"
+print(Simple.myStaticVar2)      // "static var2 in base"
+print(Simple.myClassVar)        // "class var in base"
+print(SubSimple.myClassVar)     // "class var in subclass"
+
 
