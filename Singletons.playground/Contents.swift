@@ -15,10 +15,7 @@ class SomeManager {
     func aPlusFive() -> Int {
         return a + 5
     }
-    
-    func aPlusSeven() -> Int {
-        return a + 7
-    }
+
 }
 
 SomeManager.sharedInstance.a
