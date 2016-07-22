@@ -56,6 +56,21 @@ if let gregorianCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGr
 
 // EKWeekday (EventKit Weekday) --------------------------------------
 
+/** Given an index from 0...6 (Corresponding to Monday(0) to Sunday(6))
+ Return an index from 1...7 (Corresponding to Sunday(1) to Saturday(7))
+ */
+func NSCalenderWeekdayIndexFomMyWeekdayIndex (index: Int) -> Int {
+    return (index + 8) % 7 + 1
+}
+    // Week 1
+NSCalenderWeekdayIndexFomMyWeekdayIndex(0) // Monday is 2
+NSCalenderWeekdayIndexFomMyWeekdayIndex(4) // Friday is 6
+NSCalenderWeekdayIndexFomMyWeekdayIndex(5) // Saturday is 7
+NSCalenderWeekdayIndexFomMyWeekdayIndex(6) // Sunday is 1
+    // Week 2
+NSCalenderWeekdayIndexFomMyWeekdayIndex(7) // Monday is 2
+NSCalenderWeekdayIndexFomMyWeekdayIndex(13) // Sunday is 1
+
 EKWeekday.Sunday.rawValue
 EKWeekday.Monday.rawValue
 EKWeekday.Saturday.rawValue
