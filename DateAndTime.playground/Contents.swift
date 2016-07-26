@@ -10,6 +10,12 @@ func addOneWeek(date: NSDate) -> NSDate {
 }
 addOneWeek(NSDate())
 
+func removeOneDay(date: NSDate) -> NSDate {
+    let oneDayInSeconds = 60*60*24.0
+    return NSDate(timeInterval: -oneDayInSeconds, sinceDate: date)
+}
+removeOneDay(NSDate())
+
 // NSCalendar ------------------------------------
 
 let currentCalendar = NSCalendar.currentCalendar()
@@ -54,22 +60,37 @@ if let gregorianCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGr
     
 }
 
-// EKWeekday (EventKit Weekday) --------------------------------------
+// Using 0...6 to refer to weekday numbers instead of 1...7 ------------
 
 /** Given an index from 0...6 (Corresponding to Monday(0) to Sunday(6))
  Return an index from 1...7 (Corresponding to Sunday(1) to Saturday(7))
  */
-func NSCalenderWeekdayIndexFomMyWeekdayIndex (index: Int) -> Int {
-    return (index + 8) % 7 + 1
+func NSCalenderWeekdayIndexFromMyWeekdayIndex (index: Int) -> Int {
+    return (index + 7 + 1) % 7 + 1
 }
     // Week 1
-NSCalenderWeekdayIndexFomMyWeekdayIndex(0) // Monday is 2
-NSCalenderWeekdayIndexFomMyWeekdayIndex(4) // Friday is 6
-NSCalenderWeekdayIndexFomMyWeekdayIndex(5) // Saturday is 7
-NSCalenderWeekdayIndexFomMyWeekdayIndex(6) // Sunday is 1
+NSCalenderWeekdayIndexFromMyWeekdayIndex(0) // Monday is 2
+NSCalenderWeekdayIndexFromMyWeekdayIndex(4) // Friday is 6
+NSCalenderWeekdayIndexFromMyWeekdayIndex(5) // Saturday is 7
+NSCalenderWeekdayIndexFromMyWeekdayIndex(6) // Sunday is 1
     // Week 2
-NSCalenderWeekdayIndexFomMyWeekdayIndex(7) // Monday is 2
-NSCalenderWeekdayIndexFomMyWeekdayIndex(13) // Sunday is 1
+NSCalenderWeekdayIndexFromMyWeekdayIndex(7) // Monday is 2
+NSCalenderWeekdayIndexFromMyWeekdayIndex(13) // Sunday is 1
+
+func MyWeekdayIndexFromNSCalenderWeekdayIndex (index: Int) -> Int {
+    let weekdays = [5, 6, 0, 1, 2, 3, 4]
+    return weekdays[index % 7]
+}
+MyWeekdayIndexFromNSCalenderWeekdayIndex(2) // Monday
+MyWeekdayIndexFromNSCalenderWeekdayIndex(3) // Tues
+MyWeekdayIndexFromNSCalenderWeekdayIndex(4) // Wed
+MyWeekdayIndexFromNSCalenderWeekdayIndex(5) // Thurs
+MyWeekdayIndexFromNSCalenderWeekdayIndex(6) // Fri
+MyWeekdayIndexFromNSCalenderWeekdayIndex(7) // Sat
+MyWeekdayIndexFromNSCalenderWeekdayIndex(1) // Sunday
+
+
+// EKWeekday (EventKit Weekday) --------------------------------------
 
 EKWeekday.Sunday.rawValue
 EKWeekday.Monday.rawValue
@@ -109,3 +130,36 @@ func EKRecurrenceDaysOfWeekFromIndex (index: Int) -> EKRecurrenceDayOfWeek {
 EKWeekday.Tuesday.rawValue
 EKRecurrenceDaysOfWeekFromIndex(8).dayOfTheWeek.rawValue
 EKRecurrenceDaysOfWeekFromIndex(8).weekNumber
+
+/** Given:
+        * an index 0...13 (from which we know the weekNum & weekday (i.e. Monday)
+        * a startDate
+    Return:
+        * The next date to occur on that weekday and weekNum
+            * This next date can be on or after startDate
+            * By default, we repeat a schedule every 2 weeks.
+ */
+func NSDateOfNextWeekday(index: Int, startDate: NSDate, weeksInSchedule: Int = 2) -> NSDate {
+    let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)!
+    
+    let NSWeekdayOfIndex = NSCalenderWeekdayIndexFromMyWeekdayIndex(index)
+    let nextWeekday = calendar.nextDateAfterDate(removeOneDay(startDate), matchingUnit: NSCalendarUnit.Weekday, value: NSWeekdayOfIndex, options: NSCalendarOptions.MatchNextTime)
+    
+    let eventWeekday = index % 7
+    let startNSWeekday = calendar.component(.Weekday, fromDate: startDate)
+    let startWeekday = MyWeekdayIndexFromNSCalenderWeekdayIndex(startNSWeekday)
+    var weeksFromStartWeek = index / 7
+    if weeksFromStartWeek == 0 && eventWeekday < startWeekday {
+        weeksFromStartWeek = weeksInSchedule - 1
+    } else if weeksFromStartWeek > 0 && eventWeekday < startWeekday {
+        weeksFromStartWeek -= 1
+    }
+    let oneWeekInSeconds = 60*60*24*7
+    let result = NSDate(timeInterval: Double(oneWeekInSeconds * weeksFromStartWeek), sinceDate: nextWeekday!)
+    print(result)
+    return result
+}
+let mondayFirstWeek = NSDateOfNextWeekday(3, startDate: NSDate())
+let fridayFirstWeek = NSDateOfNextWeekday(4, startDate: NSDate())
+let mondaySecondWeek = NSDateOfNextWeekday(7, startDate: NSDate())
+let fridaySecondWeek = NSDateOfNextWeekday(11, startDate: NSDate())
