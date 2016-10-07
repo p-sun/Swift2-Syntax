@@ -2,6 +2,8 @@
 
 import UIKit
 
+// "ÁlgÈBra" -> "algebra" conversion ----------------------
+
 extension String {
     
     /** Convert a string with accents into a lowercase String. i.e. "ÁlgÈBra" -> "algebra"
@@ -16,3 +18,11 @@ extension String {
 }
 
 "ÁlgÈBra".stringByRemovingAccents()
+
+// Empty Strings ---------------------------------------------
+
+let anEmptyString = ""
+let anEmptyString2 : String? = nil
+
+anEmptyString.isEmpty
+anEmptyString2?.isEmpty

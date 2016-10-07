@@ -16,6 +16,15 @@ func removeOneDay(date: NSDate) -> NSDate {
 }
 removeOneDay(NSDate())
 
+NSDate.timeIntervalSinceReferenceDate() // Seconds since Jan, 1, 2001
+
+func midnightOfDate(date: NSDate) -> NSDate? {
+    let gregorianCalendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)!
+    let midnight = gregorianCalendar.nextDateAfterDate(date, matchingHour: 23, minute: 59, second: 59, options: NSCalendarOptions.MatchNextTime)
+    return midnight
+}
+midnightOfDate(NSDate())
+
 // NSCalendar ------------------------------------
 
 let currentCalendar = NSCalendar.currentCalendar()

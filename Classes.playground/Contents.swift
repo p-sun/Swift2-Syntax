@@ -108,4 +108,20 @@ print(Simple.myStaticVar2)      // "static var2 in base"
 print(Simple.myClassVar)        // "class var in base"
 print(SubSimple.myClassVar)     // "class var in subclass"
 
+// -------- Structs ----------------------------
 
+struct Simple2 {
+    var instanceVar: Int
+    var optionalVar: String? = nil
+ 
+    init(instanceVar: Int, optionalVar: String? = nil){
+        self.instanceVar = instanceVar
+        self.optionalVar = optionalVar
+    }
+    
+    func add3() -> Int {
+        return instanceVar + 3
+    }
+}
+Simple2.init(instanceVar: 2).add3()
+Simple2.init(instanceVar: 5).add3()
