@@ -112,9 +112,11 @@ print(SubSimple.myClassVar)     // "class var in subclass"
 
 struct Simple2 {
     var instanceVar: Int
-    var optionalVar: String? = nil
+    var optionalVar: String?
+    var optionalVar2: String? // Complier doesn't force you to init optional vars
  
-    init(instanceVar: Int, optionalVar: String? = nil){
+    init(instanceVar: Int = 10, optionalVar: String?) {
+        // But YOU can force your user to init optional vars to make it more clear.
         self.instanceVar = instanceVar
         self.optionalVar = optionalVar
     }
@@ -123,5 +125,5 @@ struct Simple2 {
         return instanceVar + 3
     }
 }
-Simple2.init(instanceVar: 2).add3()
-Simple2.init(instanceVar: 5).add3()
+Simple2.init(optionalVar: "some string").add3()
+Simple2.init(instanceVar: 30, optionalVar: "some string").add3()
