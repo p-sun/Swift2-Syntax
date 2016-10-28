@@ -26,3 +26,10 @@ let anEmptyString2 : String? = nil
 
 anEmptyString.isEmpty
 anEmptyString2?.isEmpty
+
+// Trimming Strings -------------------------------------------
+
+let myString = "  \t\t  Let's trim all the whitespace  \n \t  \n  "
+let trimmedString = myString.stringByTrimmingCharactersInSet(
+    NSCharacterSet.whitespaceAndNewlineCharacterSet()
+)

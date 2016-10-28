@@ -122,8 +122,15 @@ struct Simple2 {
     }
     
     func add3() -> Int {
+        // let hello = returnHello()
+        // compiler error b/c Instance function can't call static function.
         return instanceVar + 3
     }
+    
+    static func returnHello() -> String {
+        return "hello"
+    }
+    
 }
 Simple2.init(optionalVar: "some string").add3()
 Simple2.init(instanceVar: 30, optionalVar: "some string").add3()
