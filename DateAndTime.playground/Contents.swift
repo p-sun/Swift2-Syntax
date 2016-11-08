@@ -4,17 +4,36 @@ import EventKit
 
 // NSDate -------------------------------------------
 
-func addOneWeek(date: NSDate) -> NSDate {
-    let oneWeekInSeconds = 60*60*24*7.0
-    return NSDate(timeInterval: oneWeekInSeconds, sinceDate: date)
+func addNWeeks(fromToday: NSDate, n: Int) -> NSDate {
+    let aWeekFromToday = NSCalendar.currentCalendar()
+        .dateByAddingUnit(.Day, value: 7*n, toDate: fromToday, options: []
+    )
+    return aWeekFromToday!
 }
-addOneWeek(NSDate())
+addNWeeks(NSDate(), n: 2)
 
-func removeOneDay(date: NSDate) -> NSDate {
-    let oneDayInSeconds = 60*60*24.0
-    return NSDate(timeInterval: -oneDayInSeconds, sinceDate: date)
+
+func addOneDay(today: NSDate) -> NSDate {
+    // If you simply add 24*60*60 seconds, you will not account for daylight savings time.
+    let tomorrow = NSCalendar.currentCalendar()
+        .dateByAddingUnit(.Day, value: 1, toDate: today, options: []
+    )
+    return tomorrow!
+}
+
+func removeOneDay(today: NSDate) -> NSDate {
+    let yesterday = NSCalendar.currentCalendar()
+        .dateByAddingUnit(.Day, value: -1, toDate: today, options: []
+    )
+    return yesterday!
 }
 removeOneDay(NSDate())
+
+func addOneYear(today: NSDate) -> NSDate {
+    let nextYear = NSCalendar.currentCalendar().dateByAddingUnit(.Year, value: 1, toDate: today, options: [])
+    return nextYear!
+}
+addOneYear(NSDate())
 
 NSDate.timeIntervalSinceReferenceDate() // Seconds since Jan, 1, 2001
 
@@ -24,6 +43,17 @@ func midnightOfDate(date: NSDate) -> NSDate? {
     return midnight
 }
 midnightOfDate(NSDate())
+
+func addNYears(today: NSDate, n: Int) -> NSDate {
+    let nyearsInFuture = NSCalendar.currentCalendar()
+        .dateByAddingUnit(
+            .Month,
+            value: 12 * n,
+            toDate: today,
+            options: []
+    )
+    return nyearsInFuture!
+}
 
 // NSCalendar ------------------------------------
 
@@ -163,12 +193,52 @@ func NSDateOfNextWeekday(index: Int, startDate: NSDate, weeksInSchedule: Int = 2
     } else if weeksFromStartWeek > 0 && eventWeekday < startWeekday {
         weeksFromStartWeek -= 1
     }
-    let oneWeekInSeconds = 60*60*24*7
-    let result = NSDate(timeInterval: Double(oneWeekInSeconds * weeksFromStartWeek), sinceDate: nextWeekday!)
-    print(result)
+    let result = addNWeeks(nextWeekday!, n: weeksFromStartWeek)
     return result
 }
 let mondayFirstWeek = NSDateOfNextWeekday(3, startDate: NSDate())
 let fridayFirstWeek = NSDateOfNextWeekday(4, startDate: NSDate())
 let mondaySecondWeek = NSDateOfNextWeekday(7, startDate: NSDate())
 let fridaySecondWeek = NSDateOfNextWeekday(11, startDate: NSDate())
+
+let scheduleStartDate = NSDate(timeIntervalSinceReferenceDate: 499702509.0) // Nov 1
+let startDay = NSDateOfNextWeekday(8, startDate: scheduleStartDate) // Should be Nov 8th. Tuesday of 2nd week, after daylight savings
+
+// ----------
+
+/** Return an NSDate combining the Date from an NSDate, and time from a String.
+ */
+func createNSDate(date: NSDate, time: String) -> NSDate {
+    
+    /** Takes an NSDate, and returns String in the format of
+     yyyy-MM-dd HH:mm:ss ZZZ (PFObject format) in the device's timezone.
+     */
+    func formatNSDateToString2(date: NSDate?) -> String {
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+        //    dateFormatter.timeZone = NSTimeZone.systemTimeZone()
+        let dateString = dateFormatter.stringFromDate(date!)
+        return dateString
+    }
+    
+    let dateString = formatNSDateToString2(date)
+    return createNSDateHelper(dateString, time: time)
+}
+
+func createNSDateHelper(date: String, time: String) -> NSDate {
+    let index: String.Index = date.startIndex.advancedBy(10)
+    let anewdate = date.substringToIndex(index)
+    let newDateString = anewdate.stringByAppendingString(" \(time)")
+    let dateFormatter = NSDateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+    dateFormatter.timeZone = NSTimeZone.systemTimeZone() // GMT -4
+    let fdate = dateFormatter.dateFromString(newDateString)
+    return fdate!
+}
+
+
+//let startDay = NSDate(timeIntervalSinceReferenceDate: 500097600.0) // Nov 6 12am
+//let startDayWithTime = createNSDate(startDay, time: "17:00") // Nov 6 5pm
+let endDay = addOneDay(startDay)
+let endDayWithTime = createNSDate(endDay, time: "11:00") //Nov 7 11am
+
